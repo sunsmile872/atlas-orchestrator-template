@@ -44,6 +44,8 @@ projects/[Project_Name]/
 
 ## §3. 12-Agent Mesh Routing Table (3 Tiers)
 
+Customize the capabilities below to match your local skills, MCP servers, or your own external Skill Vault GitHub repository (if you keep skills in a separate repo).
+
 ### Tier 1: Master Orchestrator (1 Agent)
 | ID | Agent | Domain | Primary Responsibilities |
 | :--- | :--- | :--- | :--- |
@@ -70,7 +72,7 @@ projects/[Project_Name]/
 
 ---
 
-## §4. Subagent Dispatch & Model Selection
+## §4. Subagent Dispatch, Model Selection & Execution Trace
 
 - **Model Tiering**:
   - `flash`: PDF splitting, video-to-slides, file parsing, email digest, formatting (`09`, `10`, routine `03`/`04`).
@@ -78,6 +80,12 @@ projects/[Project_Name]/
   - `pro`: Full manuscript synthesis, complex statistical proofs, contradiction resolution, adversarial review (`06`, `11`).
 - **Standard Dispatch Brief**:
   `[ROLE]` + `[PROJECT PATH & 6-PILLAR STATE]` + `[OBJECTIVE]` + `[LOCKED CONSTRAINTS]` + `[RETURN SOT/DIARY DIFF]`.
+- **Execution Trace Reporting (Trace-Only — Chat UI Only)**:
+  - **No Mid-Turn Dispatch Spam**: Do **not** emit progress lines before or between tool calls.
+  - **Top-of-Answer Trace**: Whenever actual work is executed (Inline task, `Sub` via `invoke_subagent`, `Swarm` via `swarm`, or Recipe), place **1 compact Pipeline Badge line** at the **very top** of the final response covering every involved agent through Tier 3 QA Gate (`11` or `12`). Skip `🧭 Trace:` on pure Q&A or chit-chat turns.
+  - **Format** (`✅` passed, `⚠️` partial/warning, `❌` blocked/failed):
+    - Inline example: ``🧭 Trace: `08 Finance & Memory` [Inline] ✅ → `12 Technical Gate` [Inline] ✅``
+    - Multi-agent example: ``🧭 Trace: `02 Domain Lead` [Inline] ✅ + `06 Data Analyst` [Sub·Pro] ✅ → `11 Citation Gate` [Inline] ✅``
 
 ---
 

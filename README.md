@@ -29,6 +29,8 @@
 * **Adaptive 2-Tier Governance:** Quick Tasks run in one turn with zero file clutter; Full Projects create 6 structured pillars in `projects/[Project_Name]/` (`PROJECT.md`, `AGENTS.md`, `SOT.md`, `ROADMAP.md`, `UX.md`, `project_diary.md` + `NotebookLM_Bundle/`).
 * **Single-Writer Memory Rule:** Only `Agent 08` writes to persistent long-term memory (`USER.md` / `MEMORY.md`), preventing race conditions when multiple agents run in parallel.
 * **Independent Tier 3 QA Gates:** `Agent 11` checks citations & statistical logic; `Agent 12` enforces PDF/visual integrity, code quality, and Banned AI Lexicon removal.
+* **Compact Execution Trace (`🧭 Trace:`):** Work responses open with a single-line pipeline badge (including Tier 3 QA Gate status) in Chat UI only—with zero mid-turn tool spam and skipped on casual Q&A.
+* **Optional Skill Vault Wiring:** Keep custom skills in your own separate/private GitHub repository and optionally set `SKILL_VAULT_BASE` in [`index.html`](index.html) to turn agent skill chips into direct links.
 * **RTK – Ponytail – Caveman Discipline:** Minimal terminal output ingestion, minimal code footprint, and high-density bullet reporting.
 
 ---

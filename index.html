@@ -290,6 +290,19 @@
       color: var(--slate-300);
     }
 
+    .skill-chip.skill-link {
+      text-decoration: none;
+      border-color: rgba(45, 212, 191, 0.35);
+      color: #99f6e4;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+    }
+
+    .skill-chip.skill-link:hover {
+      background: rgba(20, 184, 166, 0.18);
+      border-color: rgba(45, 212, 191, 0.7);
+      transform: translateY(-1px);
+    }
+
     .constraint-box {
       background: rgba(251, 113, 133, 0.08);
       border: 1px solid rgba(251, 113, 133, 0.28);
@@ -706,6 +719,10 @@
   </div>
 
   <script>
+    // Optional: set to "https://github.com/<your-user>/<your-skills-vault>/tree/main" to make skill chips clickable
+    const SKILL_VAULT_BASE = "";
+    const SKILL_VAULT_MAP = {};
+
     const AGENTS = {
       "01": {
         id: "01",
@@ -713,7 +730,7 @@
         model: "inherit / pro",
         name: "Atlas (@atlas) — Master Coordinator",
         domain: "Global Routing, Adaptive 2-Tier & Checkpoint Sync",
-        skills: ["Adaptive Classifier", "Parallel Dispatch", "Checkpoint Sync", "/compact Watch (>15 turns)"],
+        skills: ["Adaptive Classifier", "Parallel Dispatch", "Execution Trace", "Checkpoint Sync", "/compact Watch (>15 turns)"],
         constraint: "Delegates specialized work instead of doing everything inline; enforces 6 Pillars and QA Gates before delivery",
         prompt: "@atlas research topic X"
       },
@@ -919,6 +936,10 @@
       {
         title: "RTK – Ponytail – Caveman + Single-Writer Sync",
         flow: "Keep logs lean (RTK), code minimal (Ponytail), reporting dense & factual (Caveman), and route persistent memory writes through Agent 08."
+      },
+      {
+        title: "Compact Execution Trace (Trace-Only)",
+        flow: "Open completed work replies with 1 top-line 🧭 Trace: badge (Inline / Subagent / Swarm / Gate 11-12) in Chat UI only — zero mid-turn tool spam."
       }
     ];
 
@@ -962,10 +983,21 @@
       const skillsList = document.createElement("div");
       skillsList.className = "skills-list";
       a.skills.forEach(s => {
-        const chip = document.createElement("span");
-        chip.className = "skill-chip";
-        chip.textContent = s;
-        skillsList.appendChild(chip);
+        const mappedFolder = SKILL_VAULT_MAP[s] || s;
+        if (SKILL_VAULT_BASE) {
+          const link = document.createElement("a");
+          link.className = "skill-chip skill-link";
+          link.href = `${SKILL_VAULT_BASE.replace(/\/$/, "")}/${mappedFolder}`;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = `${s} ↗`;
+          skillsList.appendChild(link);
+        } else {
+          const chip = document.createElement("span");
+          chip.className = "skill-chip";
+          chip.textContent = s;
+          skillsList.appendChild(chip);
+        }
       });
       skillsSec.appendChild(skillsList);
 
