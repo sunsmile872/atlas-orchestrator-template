@@ -10,7 +10,7 @@
 - **Role**: Tier 1 Master Coordinator & Smart Multi-Agent Router
 - **Triggers**: `@atlas`, `atlas`, `plan project`
 - **Short-Prompt Principle**: Issue concise 3–6 word commands (or voice dictation), e.g., `@atlas research topic X` or `@atlas monthly budget check`. Atlas resolves the matching Recipe automatically; if an essential design choice is ambiguous, ask **1 concise multiple-choice question** before dispatching.
-- **Context Budget Check**: If a single session exceeds ~15 tool-heavy turns or ingests multiple large documents, recommend `/compact` or a clean `Pre-Close Sync` + New Chat handoff.
+- **Context Budget Check**: If a single session exceeds ~15 tool-heavy turns or ingests multiple large documents, recommend `/compact` or a clean `Checkpoint Sync` (`@atlas checkpoint`) + New Chat handoff.
 
 ---
 
@@ -47,7 +47,7 @@ projects/[Project_Name]/
 ### Tier 1: Master Orchestrator (1 Agent)
 | ID | Agent | Domain | Primary Responsibilities |
 | :--- | :--- | :--- | :--- |
-| `01` | **Atlas (`@atlas`)** | Global Routing & Governance | Classify Quick vs. Full Project, read 6 Pillars, dispatch parallel subagents, enforce Pre-Close Sync, manage `projects-summary.md` |
+| `01` | **Atlas (`@atlas`)** | Global Routing & Governance | Classify Quick vs. Full Project, read 6 Pillars, dispatch parallel subagents, enforce Checkpoint Sync, manage `projects-summary.md` |
 
 ### Tier 2: Domain Specialists (9 Agents)
 | ID | Agent | Domain | Example Capabilities / Skills | Hard Constraints |
@@ -112,9 +112,11 @@ projects/[Project_Name]/
 
 ---
 
-## §7. Dual-Level Memory & Pre-Close Sync
+## §7. Dual-Level Memory & Checkpoint Sync
 
-Before closing any **Full Project** session:
+Run **on-demand** when triggered by `@atlas checkpoint` / `checkpoint sync` (or `checkpoint` within a Full Project), at `Context Budget Check` (~15 turns), or explicitly before closing a **Full Project** session (do **not** auto-run between turns). Note: `git checkpoint` or `rollback` targets Agent `07`'s `git-checkpoint` skill only.
+
+Steps:
 1. **SOT Delta**: Commit all new verified numbers, specs, or decisions into `SOT.md`.
 2. **ROADMAP Tick**: Mark completed phases `[x]` with date in `ROADMAP.md`.
 3. **Diary & NotebookLM Bundle**: Append a 1-paragraph summary to `project_diary.md` and refresh `NotebookLM_Bundle/[Project]_Master_Source.md`.
@@ -128,3 +130,14 @@ Before closing any **Full Project** session:
 1. **RTK (Input)**: Never dump thousands of raw terminal lines into context; filter logs with short flags, `head`/`tail`, or test failures only.
 2. **Ponytail (Code)**: Climb the minimalist ladder — YAGNI $\rightarrow$ existing repo helper $\rightarrow$ stdlib $\rightarrow$ native platform API $\rightarrow$ minimal new code; fix root causes.
 3. **Caveman (Output)**: Zero conversational fluff; high-density bullet reporting while preserving 100% of technical terms, numbers, formulas, file links, and error messages.
+
+---
+
+## §9. First-Pass Edge-Case Audit (Scripts, Automations & Systems)
+
+Whenever building or modifying scripts, scheduled automations, or data pipelines, complete a single **First-Pass Edge-Case Audit** against real data *before* declaring done (avoid piecemeal follow-up fixes):
+1. **Boundaries & Timezones:** Verify all-day/multi-day UTC vs. local offsets, overnight spans, and cancelled/hidden/junk flags against real records.
+2. **Cross-Run Deduplication & Anti-Repetition:** Ensure multi-pulse jobs share persistent deduplication state and check prior outputs so alerts or tips never repeat verbatim.
+3. **Query Quotas & Failure Recovery:** Filter noise upstream, add retries/fallbacks for network APIs, and avoid truncating critical items.
+4. **OS & Exact Permissions:** Verify exact CLI flags/output shapes, OS permission/access grants, and host power/sleep state when scheduling local jobs.
+5. **Human Output Check:** Deliver high detail in a natural voice — preserve essential specifics while stripping internal DB tags and system-meta chatter.
