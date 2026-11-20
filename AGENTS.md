@@ -67,8 +67,8 @@ Customize the capabilities below to match your local skills, MCP servers, or you
 ### Tier 3: Independent Quality Gates (2 Agents)
 | ID | Agent | Gate Scope | Example Checks | Gate Mandate |
 | :--- | :--- | :--- | :--- | :--- |
-| `11` | **Citation & Evidence Gate** | Research Truth & Peer-Review Defense | `citation_engine`, `deliverable_auditor`, database lookups | 1:1 citation reality check (PMID/DOI), sample-size & subgroup arithmetic check ($n_A + n_B = N$), Pure Results objectivity, Adversarial Mock Review |
-| `12` | **Technical & Document QA Gate** | File Integrity, Visuals, Code & Anti-Slop | `deliverable_auditor`, `code-review`, `a11y-debugging`, `debug-optimize-lcp` | Verify PDF stream integrity + visual render test; verify Word OMML equations; enforce Anti-Slop & security checks |
+| `11` | **Citation & Evidence Gate** | Research Truth & Peer-Review Defense | `citation_engine`, `deliverable_auditor`, database lookups | 1:1 verbatim citation reality check (PMID/DOI/exact title & author initials), cross-file title & parameter parity across all submission forms, sample-size & subgroup arithmetic check ($n_A + n_B = N$), Pure Results objectivity, Adversarial Mock Review |
+| `12` | **Technical & Document QA Gate** | File Integrity, Visuals, Code & Anti-Slop | `deliverable_auditor`, `academic-humanizer`, `code-review`, `a11y-debugging`, `debug-optimize-lcp` | Verify PDF stream integrity + visual render test; verify Formal Monochrome `.docx` styling, native Word OMML equations, and 300-DPI embedded flowcharts (zero raw Mermaid dumps); enforce Banned AI Lexicon + **Open-Ended Domain/Clinical Register Scan (catch unseen literal AI dictionary calques & auto-append new catches to `deliverable_auditor.py`)** |
 
 ---
 
@@ -95,7 +95,7 @@ Customize the capabilities below to match your local skills, MCP servers, or you
 ## §5. Pre-Packaged Recipes (8) & Scheduled Automations (4)
 
 ### 8 Pre-Packaged Recipes
-1. **`research-proposal-recipe`**: `02` (Vault) + `06` (Multi-DB search, PICO, Sample Size, DAG) $\rightarrow$ `05` (Markdown-first proposal) $\rightarrow$ `11` (1:1 Citation Gate) $\rightarrow$ On-demand `.docx` + `12` (Document QA).
+1. **`research-proposal-recipe`**: `02` (Vault) + `06` (Multi-DB search, small-$N$ feasibility, 60-sec 3-Step Storytelling Funnel + explicit two-sided $H_0/H_1$ pitch PDF, Sample Size, Causal DAG) $\rightarrow$ `05` (Markdown-first official protocol + IRB/device forms + PIS/ICF + tear-off double-blind CRF) $\rightarrow$ `11` (1:1 Verbatim Citation & Cross-File Title/Parameter Parity Gate) $\rightarrow$ On-demand Formal Monochrome `.docx` (OMML equations + 300-DPI flowcharts) + `12` (Document & Visual Render QA).
 2. **`end-to-end-paper-recipe`**: Ideation & Novelty (`06`) $\rightarrow$ `SOT.md` lock (`06` + `11`) $\rightarrow$ Pure Results $\rightarrow$ Intro & Discussion (`05`) $\rightarrow$ Humanizer + Mock Reviewers (`11`) $\rightarrow$ Point-by-Point Rebuttal.
 3. **`paper-study-club-recipe`**: Ingest paper (`06` + `02`) $\rightarrow$ 1-paragraph Core Mental Model $\rightarrow$ Evidence Map & Toy Calculation $\rightarrow$ Statistical Weaknesses $\rightarrow$ 5-Question Active Recall Quiz (`11` verified).
 4. **`conference-deck-recipe`**: `02` + `06` lock `SOT.md` $\rightarrow$ `03` (slides + handouts) $\rightarrow$ `11` & `12` (Citation + PDF Visual QA).
@@ -116,10 +116,10 @@ Customize the capabilities below to match your local skills, MCP servers, or you
 
 1. **Zero-Fabrication**: Never invent DOIs, PMIDs, $N$, $p$-values, $OR$, $HR$, or CIs. Missing data $\rightarrow$ **STOP and ask**.
 2. **Multi-Source Literature Sweep ($\ge 4$ Sources where applicable)**: Cross-check primary trials + recent systematic reviews/meta-analyses (including negative/sham-controlled trials), trial registries/preprints, citation-index APIs, and regional/web scholarship; flag contradictions, negative trials, and certainty gaps explicitly.
-3. **Markdown-First**: Never export `.docx` unprompted; all drafts live in `.md` until explicitly approved for Word export.
+3. **Markdown-First & Formal Monochrome `.docx` Export**: Never export `.docx` unprompted; all drafts live in `.md` until explicitly approved for Word export. When exporting official IRB/grant/thesis `.docx` files, enforce **100% Formal Monochrome Academic Styling** (pure black text, `0.5 pt` black grid borders with `#F2F2F2` light-gray table headers, native OMML equations, and 300-DPI monochrome flowcharts instead of poster colors or raw Mermaid blocks).
 4. **Statistical & Formatting Rigor**: Verify subgroup arithmetic ($n_A + n_B = N$), reject $p = 0.000$ (use $p < 0.001$), enforce SI spacing, and separate Pure Results from Discussion.
-5. **Banned AI Lexicon & UI Anti-Slop**: Strip *crucial, paramount, testament, game-changer, revolutionary, landscape, beacon, delve, cutting-edge, furthermore*, vague attributions, and fake metrics.
-6. **PDF & Visual Gate**: Verify stream encoding and run an automated visual render test on generated PDFs.
+5. **Banned AI Lexicon, Open-Ended Anti-Calque & UI Anti-Slop**: Strip *crucial, paramount, testament, game-changer, revolutionary, landscape, beacon, delve, cutting-edge, furthermore*, vague attributions, and fake metrics. For non-English (e.g., Thai) clinical/academic documents, enforce **Two-Register Audience Split & Open-Ended Anti-Calque Detection** (use natural domain loanwords/acronyms like `double-blind`, `blinded assessor`, `carryover effect`, `washout period`, `conservative`, `effect size`, `power` in specialist documents rather than literal dictionary calques, and auto-append newly discovered calques to the deterministic auditor).
+6. **PDF & Visual Gate**: Verify stream encoding and run an automated visual render test on generated PDFs and embedded 300-DPI figures.
 
 ---
 
