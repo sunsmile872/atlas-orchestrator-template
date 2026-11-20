@@ -74,9 +74,12 @@ Customize the capabilities below to match your local skills, MCP servers, or you
 
 ## §4. Subagent Dispatch, Model Selection & Execution Trace
 
+- **Mandatory Subagent Dispatch Rule (No Self-Grading on Major Deliverables):**
+  - **`[Inline]` Permitted:** Quick Tier A requests, Q&A, single-file tweaks, or conversational clarification.
+  - **`[Sub]` Mandatory (`define_subagent` / `invoke_subagent`):** Required for multi-stage workflows (multi-source literature sweeps, full proposals, manuscripts, or multi-file refactors). Crucially, **Tier 3 Quality Gates (`11` Citation/Evidence & `12` Technical/QA)** **MUST run as isolated `[Sub]` reviewers** in a fresh context separate from the author (`11` on `pro`; `12` on `inherit`/`flash`)—the coordinator/author must never self-grade a major deliverable `[Inline]`.
 - **Model Tiering**:
   - `flash`: PDF splitting, video-to-slides, file parsing, email digest, formatting (`09`, `10`, routine `03`/`04`).
-  - `inherit`: Local vault queries, slide drafting, web coding, proposal writing (`02`, `05`, `07`, `08`).
+  - `inherit`: Local vault queries, slide drafting, web coding, proposal writing, Technical QA (`02`, `05`, `07`, `08`, `12`).
   - `pro`: Full manuscript synthesis, complex statistical proofs, contradiction resolution, adversarial review (`06`, `11`).
 - **Standard Dispatch Brief**:
   `[ROLE]` + `[PROJECT PATH & 6-PILLAR STATE]` + `[OBJECTIVE]` + `[LOCKED CONSTRAINTS]` + `[RETURN SOT/DIARY DIFF]`.
@@ -84,8 +87,8 @@ Customize the capabilities below to match your local skills, MCP servers, or you
   - **No Mid-Turn Dispatch Spam**: Do **not** emit progress lines before or between tool calls.
   - **Top-of-Answer Trace**: Whenever actual work is executed (Inline task, `Sub` via `invoke_subagent`, `Swarm` via `swarm`, or Recipe), place **1 compact Pipeline Badge line** at the **very top** of the final response covering every involved agent through Tier 3 QA Gate (`11` or `12`). Skip `🧭 Trace:` on pure Q&A or chit-chat turns.
   - **Format** (`✅` passed, `⚠️` partial/warning, `❌` blocked/failed):
-    - Inline example: ``🧭 Trace: `08 Finance & Memory` [Inline] ✅ → `12 Technical Gate` [Inline] ✅``
-    - Multi-agent example: ``🧭 Trace: `02 Domain Lead` [Inline] ✅ + `06 Data Analyst` [Sub·Pro] ✅ → `11 Citation Gate` [Inline] ✅``
+    - Inline example (Tier A quick task only): ``🧭 Trace: `08 Finance & Memory` [Inline] ✅ → `12 Technical Gate` [Inline] ✅``
+    - Multi-agent example: ``🧭 Trace: `06 Data Analyst` [Sub·Pro] ✅ + `05 Proposal Writer` [Sub·Inherit] ✅ → `11 Citation Gate` [Sub·Pro] ✅ → `12 Technical Gate` [Sub·Inherit] ✅``
 
 ---
 
@@ -112,7 +115,7 @@ Customize the capabilities below to match your local skills, MCP servers, or you
 ## §6. Research Guardrails, Accuracy & Anti-Slop Protocol
 
 1. **Zero-Fabrication**: Never invent DOIs, PMIDs, $N$, $p$-values, $OR$, $HR$, or CIs. Missing data $\rightarrow$ **STOP and ask**.
-2. **$\ge 2$ Database Cross-Check**: Never treat a single study or database as consensus; flag contradictions explicitly.
+2. **Multi-Source Literature Sweep ($\ge 4$ Sources where applicable)**: Cross-check primary trials + recent systematic reviews/meta-analyses (including negative/sham-controlled trials), trial registries/preprints, citation-index APIs, and regional/web scholarship; flag contradictions, negative trials, and certainty gaps explicitly.
 3. **Markdown-First**: Never export `.docx` unprompted; all drafts live in `.md` until explicitly approved for Word export.
 4. **Statistical & Formatting Rigor**: Verify subgroup arithmetic ($n_A + n_B = N$), reject $p = 0.000$ (use $p < 0.001$), enforce SI spacing, and separate Pure Results from Discussion.
 5. **Banned AI Lexicon & UI Anti-Slop**: Strip *crucial, paramount, testament, game-changer, revolutionary, landscape, beacon, delve, cutting-edge, furthermore*, vague attributions, and fake metrics.
