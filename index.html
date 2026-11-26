@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas (@atlas) — Personal Life &amp; Work OS Architecture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy-950: #060e1c;
+      --navy-900: #0b162a;
+      --navy-850: #0f1e36;
+      --navy-800: #152847;
+      --navy-700: #1e375e;
+      --teal-600: #0d9488;
+      --teal-500: #14b8a6;
+      --mint-400: #2dd4bf;
+      --mint-300: #5eead4;
+      --mint-200: #99f6e4;
+      --amber-400: #fbbf24;
+      --rose-400: #fb7185;
+      --white: #f8fafc;
+      --slate-300: #cbd5e1;
+      --slate-400: #94a3b8;
+      --border: rgba(94, 234, 212, 0.18);
+      --border-strong: rgba(45, 212, 191, 0.45);
+      --font-sans: 'Plus Jakarta Sans', 'Noto Sans Thai', system-ui, -apple-system, sans-serif;
+      --font-serif: 'Instrument Serif', Georgia, serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background:
+        radial-gradient(1200px 600px at 15% -10%, rgba(13, 148, 136, 0.22), transparent 60%),
+        radial-gradient(900px 500px at 90% 5%, rgba(45, 212, 191, 0.12), transparent 55%),
+        var(--navy-950);
+      color: var(--white);
+      line-height: 1.55;
+      min-height: 100vh;
+      padding: 2rem 1.25rem 4rem;
+    }
+
+    .container {
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 1.5rem;
+      padding-bottom: 1.75rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--mint-300);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .eyebrow-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--mint-400);
+      box-shadow: 0 0 10px var(--mint-400);
+    }
+
+    h1 {
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--white);
+    }
+
+    h1 .serif-accent {
+      font-family: var(--font-serif);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--mint-300);
+    }
+
+    .subtitle {
+      color: var(--slate-300);
+      max-width: 680px;
+      margin-top: 0.45rem;
+      font-size: 0.96rem;
+    }
+
+    .stats-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+
+    .stat-pill {
+      background: rgba(15, 30, 54, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.45rem 0.95rem;
+      font-size: 0.82rem;
+      color: var(--mint-200);
+      font-family: var(--font-mono);
+    }
+
+    /* Main Grid: SVG Diagram + Inspector */
+    .mesh-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(300px, 1fr);
+      gap: 1.25rem;
+      align-items: start;
+      margin-bottom: 2.25rem;
+    }
+
+    @media (max-width: 1024px) {
+      .mesh-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(15, 30, 54, 0.92), rgba(11, 22, 42, 0.96));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      color: var(--slate-400);
+      font-family: var(--font-mono);
+    }
+
+    /* SVG Canvas */
+    .diagram-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: 10px;
+      background: var(--navy-950);
+      border: 1px solid rgba(94, 234, 212, 0.12);
+      padding: 0.5rem;
+    }
+
+    svg.arch-svg {
+      width: 100%;
+      min-width: 720px;
+      height: auto;
+      display: block;
+    }
+
+    .svg-node {
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    .svg-node:hover rect.node-box,
+    .svg-node:focus-visible rect.node-box {
+      stroke: var(--mint-300);
+      stroke-width: 2;
+      filter: drop-shadow(0 0 8px rgba(45, 212, 191, 0.35));
+    }
+
+    .svg-node.active rect.node-box {
+      stroke: var(--mint-300);
+      stroke-width: 2.5;
+      fill: #13314a;
+      filter: drop-shadow(0 0 12px rgba(45, 212, 191, 0.45));
+    }
+
+    .svg-node:focus-visible {
+      outline: none;
+    }
+
+    .edge {
+      fill: none;
+      stroke: rgba(94, 234, 212, 0.25);
+      stroke-width: 1.5;
+    }
+
+    .edge-strong {
+      fill: none;
+      stroke: rgba(45, 212, 191, 0.55);
+      stroke-width: 2;
+      stroke-dasharray: 5 4;
+    }
+
+    /* Inspector */
+    .inspector-sticky {
+      position: sticky;
+      top: 1.25rem;
+    }
+
+    .agent-badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .badge {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      background: rgba(20, 184, 166, 0.14);
+      border: 1px solid rgba(45, 212, 191, 0.35);
+      color: var(--mint-200);
+    }
+
+    .badge.tier-3 {
+      background: rgba(251, 191, 36, 0.14);
+      border-color: rgba(251, 191, 36, 0.4);
+      color: #fde68a;
+    }
+
+    .inspector-name {
+      font-size: 1.28rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.25rem;
+    }
+
+    .inspector-domain {
+      font-size: 0.88rem;
+      color: var(--mint-300);
+      margin-bottom: 1rem;
+    }
+
+    .inspector-section {
+      margin-bottom: 1rem;
+    }
+
+    .inspector-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--slate-400);
+      margin-bottom: 0.4rem;
+    }
+
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .skill-chip {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      padding: 0.25rem 0.55rem;
+      border-radius: 6px;
+      background: var(--navy-800);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      color: var(--slate-300);
+    }
+
+    .skill-chip.skill-link {
+      text-decoration: none;
+      border-color: rgba(45, 212, 191, 0.35);
+      color: #99f6e4;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+    }
+
+    .skill-chip.skill-link:hover {
+      background: rgba(20, 184, 166, 0.18);
+      border-color: rgba(45, 212, 191, 0.7);
+      transform: translateY(-1px);
+    }
+
+    .constraint-box {
+      background: rgba(251, 113, 133, 0.08);
+      border: 1px solid rgba(251, 113, 133, 0.28);
+      border-radius: 8px;
+      padding: 0.65rem 0.8rem;
+      font-size: 0.84rem;
+      color: #fecdd3;
+    }
+
+    .prompt-box {
+      background: var(--navy-950);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .prompt-text {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--mint-200);
+      word-break: break-word;
+    }
+
+    .copy-btn {
+      flex-shrink: 0;
+      background: var(--teal-600);
+      color: var(--white);
+      border: none;
+      border-radius: 6px;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 36px;
+      transition: background 0.15s ease;
+    }
+
+    .copy-btn:hover, .copy-btn:focus-visible {
+      background: var(--teal-500);
+      outline: 2px solid var(--mint-300);
+      outline-offset: 2px;
+    }
+
+    /* Tabs */
+    .tabs-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.85rem;
+    }
+
+    .tab-btn {
+      background: var(--navy-850);
+      color: var(--slate-300);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 1.05rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn[aria-selected="true"] {
+      background: linear-gradient(135deg, var(--teal-600), #0f766e);
+      color: var(--white);
+      border-color: var(--mint-300);
+      box-shadow: 0 4px 16px rgba(13, 148, 136, 0.35);
+    }
+
+    .tab-btn:focus-visible {
+      outline: 2px solid var(--mint-300);
+      outline-offset: 2px;
+    }
+
+    .tab-panel[hidden] {
+      display: none;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background: rgba(11, 22, 42, 0.88);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.8rem;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--mint-200);
+      margin-bottom: 0.25rem;
+    }
+
+    .card-flow {
+      font-size: 0.85rem;
+      color: var(--slate-300);
+    }
+
+    .card-meta {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--slate-400);
+    }
+
+    .pillar-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .pillar-table th, .pillar-table td {
+      text-align: left;
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pillar-table th {
+      color: var(--mint-300);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+    }
+
+    .pillar-table td code {
+      font-family: var(--font-mono);
+      color: var(--mint-200);
+      background: var(--navy-800);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--slate-400);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="hero">
+      <div>
+        <div class="eyebrow"><span class="eyebrow-dot"></span> OPEN TEMPLATE • PERSONAL LIFE &amp; WORK OS</div>
+        <h1>Atlas (<span class="serif-accent">@atlas</span>) Orchestrator</h1>
+        <p class="subtitle">
+          Generic 12-Agent Multi-Agent OS Template for Knowledge Work, Research, Presentations, Media Privacy, Automation &amp; Personal Finance — powered by 3–5 word prompts, <code>SOT.md</code> project memory, and Single-Writer long-term sync.
+        </p>
+      </div>
+      <div class="stats-strip" aria-label="Architecture Summary">
+        <span class="stat-pill">12 Agents • 3 Tiers</span>
+        <span class="stat-pill">8 Recipes • 4 Automations</span>
+        <span class="stat-pill">Adaptive 2-Tier</span>
+        <span class="stat-pill">Hermes Single-Writer</span>
+      </div>
+    </header>
+
+    <section class="mesh-grid" aria-label="Interactive Multi-Agent Architecture">
+      <div class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">3-Tier 12-Agent Mesh Diagram</h2>
+          <span class="hint">คลิกที่กล่อง Agent เพื่อดู Skill &amp; ตัวอย่างคำสั่ง</span>
+        </div>
+        <div class="diagram-wrap">
+          <svg class="arch-svg" viewBox="0 0 880 610" role="img" aria-label="Atlas 12-Agent Architecture Diagram">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#2dd4bf" opacity="0.7" />
+              </marker>
+            </defs>
+
+            <!-- Tier Bands -->
+            <rect x="14" y="14" width="852" height="106" rx="12" fill="#0b182e" stroke="rgba(94,234,212,0.18)" />
+            <text x="28" y="34" fill="#5eead4" font-size="11" font-family="JetBrains Mono, monospace">TIER 1 • MASTER COORDINATOR &amp; ADAPTIVE CLASSIFIER</text>
+
+            <rect x="14" y="136" width="852" height="296" rx="12" fill="#0b182e" stroke="rgba(94,234,212,0.18)" />
+            <text x="28" y="156" fill="#5eead4" font-size="11" font-family="JetBrains Mono, monospace">TIER 2 • 9 DOMAIN SPECIALISTS (PARALLEL EXECUTION)</text>
+
+            <rect x="14" y="448" width="852" height="148" rx="12" fill="#0b182e" stroke="rgba(251,191,36,0.28)" />
+            <text x="28" y="468" fill="#fde68a" font-size="11" font-family="JetBrains Mono, monospace">TIER 3 • INDEPENDENT QUALITY GATES &amp; MEMORY SYNC</text>
+
+            <!-- Edges from Tier 1 to Tier 2 -->
+            <path class="edge-strong" d="M 440 104 L 440 130 L 155 130 L 155 170" marker-end="url(#arrow)" />
+            <path class="edge-strong" d="M 440 130 L 440 170" marker-end="url(#arrow)" />
+            <path class="edge-strong" d="M 440 130 L 725 130 L 725 170" marker-end="url(#arrow)" />
+
+            <!-- Tier 2 to Tier 3 -->
+            <path class="edge" d="M 155 415 L 155 480 L 230 480" marker-end="url(#arrow)" />
+            <path class="edge" d="M 440 415 L 440 448 L 285 480" marker-end="url(#arrow)" />
+            <path class="edge" d="M 440 415 L 440 448 L 620 480" marker-end="url(#arrow)" />
+            <path class="edge" d="M 725 415 L 725 480 L 660 480" marker-end="url(#arrow)" />
+
+            <!-- Input Prompt Box -->
+            <rect x="34" y="48" width="215" height="54" rx="9" fill="#132542" stroke="rgba(94,234,212,0.3)" />
+            <text x="48" y="70" fill="#99f6e4" font-size="11" font-family="JetBrains Mono, monospace">USER INPUT (3–5 WORDS)</text>
+            <text x="48" y="89" fill="#f8fafc" font-size="12" font-weight="600">@atlas ... / Wispr Flow</text>
+            <path class="edge-strong" d="M 249 75 L 306 75" marker-end="url(#arrow)" />
+
+            <!-- Classifier Box -->
+            <rect x="632" y="48" width="215" height="54" rx="9" fill="#132542" stroke="rgba(94,234,212,0.3)" />
+            <text x="646" y="70" fill="#5eead4" font-size="11" font-family="JetBrains Mono, monospace">ADAPTIVE 2-TIER</text>
+            <text x="646" y="89" fill="#f8fafc" font-size="11.5">Quick Task vs. 6-Pillar</text>
+            <path class="edge" d="M 572 75 L 630 75" marker-end="url(#arrow)" />
+
+            <!-- Node 01: Atlas -->
+            <g class="svg-node active" data-agent="01" tabindex="0" role="button" aria-label="Agent 01 Atlas">
+              <rect class="node-box" x="308" y="45" width="264" height="60" rx="10" fill="#112a46" stroke="#2dd4bf" stroke-width="2" />
+              <text x="324" y="69" fill="#5eead4" font-size="11" font-family="JetBrains Mono, monospace">01 • TIER 1 MASTER</text>
+              <text x="324" y="90" fill="#f8fafc" font-size="14" font-weight="700">Atlas (@atlas) Coordinator</text>
+            </g>
+
+            <!-- Tier 2 Group Labels -->
+            <text x="36" y="176" fill="#94a3b8" font-size="10.5" font-family="JetBrains Mono, monospace">KNOWLEDGE &amp; VISUAL</text>
+            <text x="318" y="176" fill="#94a3b8" font-size="10.5" font-family="JetBrains Mono, monospace">RESEARCH &amp; STUDY</text>
+            <text x="602" y="176" fill="#94a3b8" font-size="10.5" font-family="JetBrains Mono, monospace">SYSTEMS, FINANCE &amp; LIFE</text>
+
+            <!-- Column 1: 02, 03, 04 -->
+            <g class="svg-node" data-agent="02" tabindex="0" role="button" aria-label="Agent 02 Domain Knowledge Lead">
+              <rect class="node-box" x="34" y="186" width="246" height="66" rx="9" fill="#10213b" stroke="rgba(45,212,191,0.35)" />
+              <text x="48" y="208" fill="#2dd4bf" font-size="10.5" font-family="JetBrains Mono, monospace">02 • INHERIT</text>
+              <text x="48" y="227" fill="#f8fafc" font-size="13" font-weight="600">Domain Knowledge Lead</text>
+              <text x="48" y="243" fill="#94a3b8" font-size="10.5">knowledge-vault • study-notes</text>
+            </g>
+
+            <g class="svg-node" data-agent="03" tabindex="0" role="button" aria-label="Agent 03 Slide and Visual Designer">
+              <rect class="node-box" x="34" y="264" width="246" height="66" rx="9" fill="#10213b" stroke="rgba(45,212,191,0.35)" />
+              <text x="48" y="286" fill="#2dd4bf" font-size="10.5" font-family="JetBrains Mono, monospace">03 • FLASH / INHERIT</text>
+              <text x="48" y="305" fill="#f8fafc" font-size="13" font-weight="600">Slide &amp; Visual Designer</text>
+              <text x="48" y="321" fill="#94a3b8" font-size="10.5">slide-creator • slide-auditor • A4</text>
+            </g>
+
+            <g class="svg-node" data-agent="04" tabindex="0" role="button" aria-label="Agent 04 Media and Privacy Specialist">
+              <rect class="node-box" x="34" y="342" width="246" height="66" rx="9" fill="#10213b" stroke="rgba(45,212,191,0.35)" />
+              <text x="48" y="364" fill="#2dd4bf" font-size="10.5" font-family="JetBrains Mono, monospace">04 • FLASH (NO AI PHOTOS)</text>
+              <text x="48" y="383" fill="#f8fafc" font-size="13" font-weight="600">Media &amp; Privacy Specialist</text>
+              <text x="48" y="399" fill="#94a3b8" font-size="10.5">1:1-comparison • face-blur</text>
+            </g>
+
+            <!-- Column 2: 05, 06, 09 -->
+            <g class="svg-node" data-agent="05" tabindex="0" role="button" aria-label="Agent 05 Research and Proposal Writer">
+              <rect class="node-box" x="316" y="186" width="248" height="66" rx="9" fill="#10213b" stroke="rgba(45,212,191,0.35)" />
+              <text x="330" y="208" fill="#2dd4bf" font-size="10.5" font-family="JetBrains Mono, monospace">05 • INHERIT / PRO</text>
+              <text x="330" y="227" fill="#f8fafc" font-size="13" font-weight="600">Research &amp; Proposal Writer</text>
+              <text x="330" y="243" fill="#94a3b8" font-size="10.5">Proposal • Grant • Humanizer</text>
+            </g>
+
+            <g class="svg-node" data-agent="06" tabindex="0" role="button" aria-label="Agent 06 Data and Literature Analyst">
+              <rect class="node-box" x="316" y="264" width="248" height="66" rx="9" fill="#10213b" stroke="rgba(45,212,191,0.35)" />
+              <text x="330" y="286" fill="#2dd4bf" font-size="10.5" font-family="JetBrains Mono, monospace">06 • PRO</text>
+              <text x="330" y="305" fill="#f8fafc" font-size="13" font-weight="600">Data &amp; Literature Analyst</text>
+              <text x="330" y="321" fill="#94a3b8" font-size="10.5">PubMed • OpenAlex • Stats • DAG</text>
+            </g>
+
+            <g class="svg-node" data-agent="09" tabindex="0" role="button" aria-label="Agent 09 Reading and Knowledge Curator">
+              <rect class="node-box" x="316" y="342" width="248" height="66" rx="9" fill="#10213b" stroke="rgba(45,212,191,0.35)" />
+              <text x="330" y="364" fill="#2dd4bf" font-size="10.5" font-family="JetBrains Mono, monospace">09 • FLASH</text>
+              <text x="330" y="383" fill="#f8fafc" font-size="13" font-weight="600">Reading &amp; Knowledge Curator</text>
+              <text x="330" y="399" fill="#94a3b8" font-size="10.5">video-to-pdf • book-summary • split</text>
+            </g>
+
+            <!-- Column 3: 07, 08, 10 -->
+            <g class="svg-node" data-agent="07" tabindex="0" role="button" aria-label="Agent 07 Full-Stack and Automation Engineer">
+              <rect class="node-box" x="600" y="186" width="248" height="66" rx="9" fill="#10213b" stroke="rgba(45,212,191,0.35)" />
+              <text x="614" y="208" fill="#2dd4bf" font-size="10.5" font-family="JetBrains Mono, monospace">07 • INHERIT</text>
+              <text x="614" y="227" fill="#f8fafc" font-size="13" font-weight="600">Full-Stack &amp; Automation</text>
+              <text x="614" y="243" fill="#94a3b8" font-size="10.5">schedule-sync • Firebase • Web/CLI</text>
+            </g>
+
+            <g class="svg-node" data-agent="08" tabindex="0" role="button" aria-label="Agent 08 Finance and Memory Officer">
+              <rect class="node-box" x="600" y="264" width="248" height="66" rx="9" fill="#10213b" stroke="rgba(45,212,191,0.35)" />
+              <text x="614" y="286" fill="#2dd4bf" font-size="10.5" font-family="JetBrains Mono, monospace">08 • SINGLE WRITER</text>
+              <text x="614" y="305" fill="#f8fafc" font-size="13" font-weight="600">Finance &amp; Memory Officer</text>
+              <text x="614" y="321" fill="#94a3b8" font-size="10.5">Cash Flow • DCA • Persistent Memory</text>
+            </g>
+
+            <g class="svg-node" data-agent="10" tabindex="0" role="button" aria-label="Agent 10 Travel Admin and Inbox Concierge">
+              <rect class="node-box" x="600" y="342" width="248" height="66" rx="9" fill="#10213b" stroke="rgba(45,212,191,0.35)" />
+              <text x="614" y="364" fill="#2dd4bf" font-size="10.5" font-family="JetBrains Mono, monospace">10 • FLASH</text>
+              <text x="614" y="383" fill="#f8fafc" font-size="13" font-weight="600">Travel, Admin &amp; Inbox</text>
+              <text x="614" y="399" fill="#94a3b8" font-size="10.5">gmail • gcalendar • Travel • gdocs</text>
+            </g>
+
+            <!-- Tier 3: 11, 12 + Sync Pill -->
+            <g class="svg-node" data-agent="11" tabindex="0" role="button" aria-label="Agent 11 Citation and Evidence Gate">
+              <rect class="node-box" x="34" y="482" width="320" height="86" rx="10" fill="#162338" stroke="rgba(251,191,36,0.45)" />
+              <text x="50" y="505" fill="#fde68a" font-size="10.5" font-family="JetBrains Mono, monospace">11 • TIER 3 GATE (PRO)</text>
+              <text x="50" y="526" fill="#f8fafc" font-size="13.5" font-weight="700">Citation &amp; Evidence Gate</text>
+              <text x="50" y="544" fill="#cbd5e1" font-size="11">1:1 PubMed/DOI • ≥2 DBs • Mock Reviewer 1&amp;2</text>
+              <text x="50" y="559" fill="#94a3b8" font-size="10.5">Zero-Fabrication • Pure Results • Rebuttal</text>
+            </g>
+
+            <g class="svg-node" data-agent="12" tabindex="0" role="button" aria-label="Agent 12 Technical and Document QA Gate">
+              <rect class="node-box" x="526" y="482" width="320" height="86" rx="10" fill="#162338" stroke="rgba(251,191,36,0.45)" />
+              <text x="542" y="505" fill="#fde68a" font-size="10.5" font-family="JetBrains Mono, monospace">12 • TIER 3 GATE (FLASH / INHERIT)</text>
+              <text x="542" y="526" fill="#f8fafc" font-size="13.5" font-weight="700">Technical &amp; Document QA Gate</text>
+              <text x="542" y="544" fill="#cbd5e1" font-size="11">PDF /DCTDecode + Visual QA • OMML • 1:1 Scale</text>
+              <text x="542" y="559" fill="#94a3b8" font-size="10.5">code-review • a11y • Banned AI Lexicon</text>
+            </g>
+
+            <!-- Center Sync Pillar -->
+            <rect x="372" y="486" width="136" height="78" rx="10" fill="#0d2b38" stroke="#14b8a6" stroke-dasharray="4 3" />
+            <text x="440" y="510" text-anchor="middle" fill="#5eead4" font-size="10.5" font-family="JetBrains Mono, monospace">CHECKPOINT SYNC</text>
+            <text x="440" y="529" text-anchor="middle" fill="#f8fafc" font-size="11.5" font-weight="600">SOT.md + ROADMAP</text>
+            <text x="440" y="547" text-anchor="middle" fill="#99f6e4" font-size="10.5">Hermes • NotebookLM</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Inspector Panel -->
+      <aside class="panel inspector-sticky" aria-live="polite">
+        <div class="panel-header">
+          <h2 class="panel-title">Agent Inspector</h2>
+          <span class="hint">Live Details</span>
+        </div>
+        <div id="inspector-body"></div>
+      </aside>
+    </section>
+
+    <!-- Lower Explorer Tabs -->
+    <section class="panel" aria-label="Recipes, Automations, Pillars, and Guardrails">
+      <div class="tabs-bar" role="tablist">
+        <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-recipes" id="tab-recipes">8 Recipes สำเร็จรูป</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-automations" id="tab-automations">4 Scheduled Automations</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-pillars" id="tab-pillars">Adaptive 2-Tier &amp; 6 Pillars</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-guardrails" id="tab-guardrails">Research &amp; QA Guardrails</button>
+      </div>
+
+      <div id="panel-recipes" class="tab-panel" role="tabpanel" aria-labelledby="tab-recipes">
+        <div class="cards-grid" id="recipes-grid"></div>
+      </div>
+
+      <div id="panel-automations" class="tab-panel" role="tabpanel" aria-labelledby="tab-automations" hidden>
+        <div class="cards-grid" id="automations-grid"></div>
+      </div>
+
+      <div id="panel-pillars" class="tab-panel" role="tabpanel" aria-labelledby="tab-pillars" hidden>
+        <p style="color: var(--slate-300); margin-bottom: 1rem; font-size: 0.9rem;">
+          <strong>งานไว (Quick Task)</strong> รันจบทันทีไม่สร้างไฟล์รก — ส่วน <strong>โปรเจกต์ยาว (Full Project)</strong> จะสร้าง 6 เสาหลักไว้ใน <code>projects/[ชื่อโปรเจกต์]/</code> เพื่อเปิด New Chat มาทำต่อได้ตลอด 100%:
+        </p>
+        <table class="pillar-table">
+          <thead>
+            <tr>
+              <th>ไฟล์</th>
+              <th>ภาษาคน (คืออะไร?)</th>
+              <th>ป้องกันปัญหาอะไร</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>PROJECT.md</code></td>
+              <td>ใบขอบเขตงาน (ทำอะไร / ห้ามแตะอะไร)</td>
+              <td>งานบานปลาย / แก้ไฟล์ผิดส่วน</td>
+            </tr>
+            <tr>
+              <td><code>SOT.md</code></td>
+              <td>สมุดโน้ตความจริงกลาง (ตัวเลข, $N$, $p$, PMID จริง)</td>
+              <td>AI ลืมตัวเลขข้ามแชท / แต่งข้อมูลมั่ว</td>
+            </tr>
+            <tr>
+              <td><code>ROADMAP.md</code></td>
+              <td>To-Do List ลำดับเฟส <code>[x]</code></td>
+              <td>ข้ามขั้นตอน / ลืมว่าทำค้างตรงไหน</td>
+            </tr>
+            <tr>
+              <td><code>AGENTS.md</code></td>
+              <td>สิทธิ์ประจำโปรเจกต์</td>
+              <td>Agent แตะไฟล์นอกสายงาน</td>
+            </tr>
+            <tr>
+              <td><code>UX.md</code></td>
+              <td>หน้าตา &amp; เกณฑ์ตรวจรับงาน</td>
+              <td>ผลลัพธ์ไม่ตรงตามที่ต้องการ</td>
+            </tr>
+            <tr>
+              <td><code>graft/</code> + <code>NotebookLM_Bundle/</code></td>
+              <td>แผนที่โค้ด + ไฟล์สรุปรวมสำหรับโยนขึ้น NotebookLM</td>
+              <td>แก้โค้ดพัง dependency + พร้อมทบทวนตลอด</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="panel-guardrails" class="tab-panel" role="tabpanel" aria-labelledby="tab-guardrails" hidden>
+        <div class="cards-grid" id="guardrails-grid"></div>
+      </div>
+    </section>
+
+    <footer>
+      <span>Atlas (@atlas) • Personal Life &amp; Work OS Blueprint (Phase 1)</span>
+      <span>Theme: Dark Navy • Teal • Mint | Single Source of Truth: <code>AGENTS.md</code></span>
+    </footer>
+  </div>
+
+  <script>
+    // Optional: set to "https://github.com/<your-user>/<your-skills-vault>/tree/main" to make skill chips clickable
+    const SKILL_VAULT_BASE = "";
+    const SKILL_VAULT_MAP = {};
+
+    const AGENTS = {
+      "01": {
+        id: "01",
+        tier: "Tier 1 • Master Orchestrator",
+        model: "inherit / pro",
+        name: "Atlas (@atlas) — Master Coordinator",
+        domain: "Global Routing, Adaptive 2-Tier & Checkpoint Sync",
+        skills: ["Adaptive Classifier", "Parallel Dispatch", "Execution Trace", "Checkpoint Sync", "/compact Watch (>15 turns)"],
+        constraint: "Delegates specialized work instead of doing everything inline; enforces 6 Pillars and QA Gates before delivery",
+        prompt: "@atlas research topic X"
+      },
+      "02": {
+        id: "02",
+        tier: "Tier 2 • Knowledge Specialist",
+        model: "inherit",
+        name: "Domain Knowledge Lead",
+        domain: "Local Knowledge Vault, Case Notes & Study Prep",
+        skills: ["knowledge-vault", "lecture-notes", "paper-lab"],
+        constraint: "Grounds answers in your local reference vault & primary textbooks; delegates external literature searches to Agent 06",
+        prompt: "@atlas query vault for concept X"
+      },
+      "03": {
+        id: "03",
+        tier: "Tier 2 • Visual & Slides",
+        model: "flash / inherit",
+        name: "Slide & Visual Designer",
+        domain: "Presentations, One-Page Guides & A4 Infographics",
+        skills: ["slide-creator", "slide-auditor", "guide-maker"],
+        constraint: "Reads verified numbers from SOT.md only; enforces concise bullets and Navy/Teal/Mint visual standards",
+        prompt: "@atlas build deck + 1-page handout for topic Y"
+      },
+      "04": {
+        id: "04",
+        tier: "Tier 2 • Media & Privacy",
+        model: "flash",
+        name: "Media & Privacy Specialist",
+        domain: "1:1 Before/After Alignment & Privacy De-Identification",
+        skills: ["media-comparison", "face-blur"],
+        constraint: "HARD LOCK: Never alter real documentary/subject photos with generative AI; enforce exact 1:1 scale calibration",
+        prompt: "@atlas blur faces + align 1:1 in this folder"
+      },
+      "05": {
+        id: "05",
+        tier: "Tier 2 • Research Writer",
+        model: "inherit / pro",
+        name: "Research & Proposal Writer",
+        domain: "Study Proposals, Grant/Ethics Drafts & Manuscripts",
+        skills: ["docx-math-formatter (on-demand)", "Academic Humanizer", "3-Para Intro / 6-Step Discussion"],
+        constraint: "Markdown-First: never export .docx until requested; keep Results strictly separate from Discussion",
+        prompt: "@atlas draft proposal from SOT.md in markdown"
+      },
+      "06": {
+        id: "06",
+        tier: "Tier 2 • Data & Literature",
+        model: "pro",
+        name: "Data & Literature Analyst",
+        domain: "Academic Databases, Sample Size & Statistical Modeling",
+        skills: ["pubmed-database", "literature-search-openalex", "literature-search-europepmc", "statsmodels", "xlsx"],
+        constraint: "Cross-check >= 2 independent databases; enforce statistical power & Causal DAG; zero fabricated DOIs or numbers",
+        prompt: "@atlas find literature gap and compute sample size"
+      },
+      "07": {
+        id: "07",
+        tier: "Tier 2 • Engineering & Ops",
+        model: "inherit",
+        name: "Full-Stack & Automation Engineer",
+        domain: "Web Apps, Schedule Sync, System & Repo Ops",
+        skills: ["modern-web-guidance", "firebase-basics", "firebase-firestore", "prototype", "tdd", "diagnosing-bugs", "git-checkpoint"],
+        constraint: "Check modern web guidance first for HTML/CSS/JS; follow minimal code ladder (YAGNI -> stdlib -> minimal code)",
+        prompt: "@atlas sync schedule or scaffold web prototype"
+      },
+      "08": {
+        id: "08",
+        tier: "Tier 2 • Finance & Memory",
+        model: "inherit",
+        name: "Finance & Memory Officer",
+        domain: "Monthly Cash Flow, Auto-DCA, Surplus & Memory Sync",
+        skills: ["gsheets", "USER.md", "MEMORY.md"],
+        constraint: "SINGLE WRITER: Only agent permitted to write persistent personal memory (receives summary diffs from other agents)",
+        prompt: "@atlas reconcile this month's budget and surplus"
+      },
+      "09": {
+        id: "09",
+        tier: "Tier 2 • Knowledge Ingestion",
+        model: "flash",
+        name: "Reading & Knowledge Curator",
+        domain: "Video-to-PDF Slides, Book Summaries & NotebookLM Splitting",
+        skills: ["video-to-pdf-slides", "video-compressor", "book-summary", "pdf-splitter-notebooklm"],
+        constraint: "Split NotebookLM PDFs strictly <500 pages and <200 MB per file; hand off extracted lecture PDFs to Agent 02",
+        prompt: "@atlas extract slides from video and split PDF for NotebookLM"
+      },
+      "10": {
+        id: "10",
+        tier: "Tier 2 • Lifestyle & Inbox",
+        model: "flash",
+        name: "Travel, Admin & Inbox Concierge",
+        domain: "Travel Logistics, Email Digests & Multi-Calendar Sync",
+        skills: ["gmail", "gcalendar", "gdocs", "gsheets", "gdrive"],
+        constraint: "Check all connected calendars for availability; forward finalized life milestones to Agent 08 for memory sync",
+        prompt: "@atlas summarize unread emails and check tomorrow's schedule"
+      },
+      "11": {
+        id: "11",
+        tier: "Tier 3 • Quality Gate",
+        model: "pro",
+        name: "Citation & Evidence Gate",
+        domain: "1:1 Reference Verification, Mock Reviewer & Rebuttal",
+        skills: ["pubmed-database", "literature-search-europepmc", "literature-search-openalex", "Adversarial Mock Review"],
+        constraint: "Verify every PMID/DOI 1:1 against real databases and check subgroup arithmetic (nA+nB=N) before approval",
+        prompt: "@atlas verify citations and run mock reviewer check"
+      },
+      "12": {
+        id: "12",
+        tier: "Tier 3 • Technical QA Gate",
+        model: "flash / inherit",
+        name: "Technical & Document QA Gate",
+        domain: "PDF Integrity, Visual QA, OMML, Code & Anti-Slop",
+        skills: ["code-review", "a11y-debugging", "debug-optimize-lcp", "firebase-security-rules-auditor"],
+        constraint: "Run PDF stream & visual render checks, OMML equation verification, and Banned AI Lexicon audits",
+        prompt: "@atlas run QA on generated PDF and codebase"
+      }
+    };
+
+    const RECIPES = [
+      {
+        title: "1. research-proposal-recipe",
+        flow: "02 (Vault) + 06 (Multi-DB Search + PICO + Sample Size + DAG) → 05 (Markdown Proposal) → 11 (1:1 Citation Gate) → On-demand .docx (OMML)",
+        prompt: "@atlas research proposal on topic X"
+      },
+      {
+        title: "2. end-to-end-paper-recipe",
+        flow: "Novelty & SOT Lock → Pure Results (Tables 1–3) → 6-Step Discussion + Humanizer → Mock Reviewer 1 & 2 → Rebuttal Engine",
+        prompt: "@atlas draft manuscript from SOT stats"
+      },
+      {
+        title: "3. paper-study-club-recipe",
+        flow: "Ingest Paper → Core Mental Model (1 paragraph) → Evidence Map & Toy Math → Statistical Weaknesses → 5-Question Recall Quiz",
+        prompt: "@atlas journal club this paper"
+      },
+      {
+        title: "4. conference-deck-recipe",
+        flow: "02 (Vault) + 06 (Databases) lock SOT → 03 (slides + speaker notes + A4 handout) → 11 & 12 (Citation + Visual QA)",
+        prompt: "@atlas build presentation for topic Y"
+      },
+      {
+        title: "5. media-privacy-recipe",
+        flow: "04 (face-blur + 1:1 scale comparison, zero AI photo edits) → 03 (optional handout) → 12 (Visual & PDF QA)",
+        prompt: "@atlas blur faces + align 1:1"
+      },
+      {
+        title: "6. dev-schedule-recipe",
+        flow: "07 (Calendar sync + availability check / or Webapp + TDD) → 12 (code-review + a11y)",
+        prompt: "@atlas check availability and build prototype"
+      },
+      {
+        title: "7. reading-notebooklm-recipe",
+        flow: "09 (video-to-pdf-slides / pdf-splitter <500p / book-summary + A4 poster) → handoff to 02 (lecture-notes)",
+        prompt: "@atlas extract slides and split PDF for NotebookLM"
+      },
+      {
+        title: "8. finance-memory-sync-recipe",
+        flow: "08 (reconcile inflows vs. fixed/variable outflows → compute surplus allocation) → Single-Writer sync to Persistent Memory",
+        prompt: "@atlas reconcile monthly budget"
+      }
+    ];
+
+    const AUTOMATIONS = [
+      {
+        title: "1. Daily Morning Briefing",
+        flow: "Runs every morning (10): Aggregates Google + local calendars and last-24h emails into a compact mobile chat digest",
+        prompt: "/automation daily morning briefing to Discord/Slack"
+      },
+      {
+        title: "2. Weekly Research Radar",
+        flow: "Runs weekly (06): Scans pinned topics across PubMed / OpenAlex and delivers top 3–5 verified abstracts",
+        prompt: "/automation weekly research radar every Sunday"
+      },
+      {
+        title: "3. Monthly Cash Flow & DCA Checklist",
+        flow: "Runs monthly before auto-invest date (08): Summarizes recurring transfers and calculates leftover surplus",
+        prompt: "/automation monthly budget checklist on the 3rd"
+      },
+      {
+        title: "4. Pre-Presentation Slide Audit",
+        flow: "Runs before scheduled talks (03 + 12): Audits slide decks for typos, layout overflow, and citation fidelity",
+        prompt: "@atlas audit upcoming presentation deck"
+      }
+    ];
+
+    const GUARDRAILS = [
+      {
+        title: "Zero-Fabrication & >= 2 Databases",
+        flow: "Never invent DOIs, PMIDs, N, p, OR, HR, or CIs; verify key claims across >= 2 independent sources and flag contradictions."
+      },
+      {
+        title: "Markdown-First + On-Demand OMML",
+        flow: "Draft and audit proposals/manuscripts in clean .md first — export Word (.docx with native OMML equations) only when requested."
+      },
+      {
+        title: "Statistical & Results Purity",
+        flow: "Enforce statistical power & Causal DAGs, verify subgroup arithmetic (nA+nB=N), avoid p=0.000, and separate Results from Discussion."
+      },
+      {
+        title: "Humanizer & Banned AI Lexicon",
+        flow: "Strip generic AI clichés (crucial, delve, landscape, testament, furthermore), simulate adversarial reviewers, and build rebuttal tables."
+      },
+      {
+        title: "PDF Stream & Visual Render Gate",
+        flow: "Verify JPEG streams (/Filter /DCTDecode, uncompressed) and run automated page render tests; zero generative edits on real photos."
+      },
+      {
+        title: "RTK – Ponytail – Caveman + Single-Writer Sync",
+        flow: "Keep logs lean (RTK), code minimal (Ponytail), reporting dense & factual (Caveman), and route persistent memory writes through Agent 08."
+      },
+      {
+        title: "Compact Execution Trace (Trace-Only)",
+        flow: "Open completed work replies with 1 top-line 🧭 Trace: badge (Inline / Subagent / Swarm / Gate 11-12) in Chat UI only — zero mid-turn tool spam."
+      }
+    ];
+
+    function copyText(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = "Copied!";
+        setTimeout(() => { btn.textContent = orig; }, 1200);
+      });
+    }
+
+    function renderInspector(agentId) {
+      const a = AGENTS[agentId];
+      if (!a) return;
+      document.querySelectorAll(".svg-node").forEach(el => {
+        el.classList.toggle("active", el.dataset.agent === agentId);
+      });
+
+      const isTier3 = a.tier.includes("Tier 3");
+      const container = document.getElementById("inspector-body");
+      container.innerHTML = "";
+
+      const badgeRow = document.createElement("div");
+      badgeRow.className = "agent-badge-row";
+      badgeRow.innerHTML = `
+        <span class="badge ${isTier3 ? "tier-3" : ""}">${a.tier}</span>
+        <span class="badge">Model: ${a.model}</span>
+      `;
+
+      const title = document.createElement("div");
+      title.className = "inspector-name";
+      title.textContent = `${a.id}. ${a.name}`;
+
+      const domain = document.createElement("div");
+      domain.className = "inspector-domain";
+      domain.textContent = a.domain;
+
+      const skillsSec = document.createElement("div");
+      skillsSec.className = "inspector-section";
+      skillsSec.innerHTML = `<div class="inspector-label">Mapped Skills / Tools</div>`;
+      const skillsList = document.createElement("div");
+      skillsList.className = "skills-list";
+      a.skills.forEach(s => {
+        const mappedFolder = SKILL_VAULT_MAP[s] || s;
+        if (SKILL_VAULT_BASE) {
+          const link = document.createElement("a");
+          link.className = "skill-chip skill-link";
+          link.href = `${SKILL_VAULT_BASE.replace(/\/$/, "")}/${mappedFolder}`;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = `${s} ↗`;
+          skillsList.appendChild(link);
+        } else {
+          const chip = document.createElement("span");
+          chip.className = "skill-chip";
+          chip.textContent = s;
+          skillsList.appendChild(chip);
+        }
+      });
+      skillsSec.appendChild(skillsList);
+
+      const constSec = document.createElement("div");
+      constSec.className = "inspector-section";
+      constSec.innerHTML = `<div class="inspector-label">Hard Rules &amp; Boundaries</div>`;
+      const constBox = document.createElement("div");
+      constBox.className = "constraint-box";
+      constBox.textContent = a.constraint;
+      constSec.appendChild(constBox);
+
+      const promptSec = document.createElement("div");
+      promptSec.className = "inspector-section";
+      promptSec.innerHTML = `<div class="inspector-label">ตัวอย่างคำสั่งสั้น (Copy ไปใช้ได้)</div>`;
+      const promptBox = document.createElement("div");
+      promptBox.className = "prompt-box";
+      const promptSpan = document.createElement("span");
+      promptSpan.className = "prompt-text";
+      promptSpan.textContent = a.prompt;
+      const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.className = "copy-btn";
+      copyBtn.textContent = "Copy";
+      copyBtn.addEventListener("click", () => copyText(a.prompt, copyBtn));
+      promptBox.append(promptSpan, copyBtn);
+      promptSec.appendChild(promptBox);
+
+      container.append(badgeRow, title, domain, skillsSec, constSec, promptSec);
+    }
+
+    function renderCardGrid(targetId, items, showPrompt) {
+      const grid = document.getElementById(targetId);
+      grid.innerHTML = "";
+      items.forEach(item => {
+        const card = document.createElement("article");
+        card.className = "card";
+
+        const top = document.createElement("div");
+        const title = document.createElement("div");
+        title.className = "card-title";
+        title.textContent = item.title;
+        const flow = document.createElement("p");
+        flow.className = "card-flow";
+        flow.textContent = item.flow;
+        top.append(title, flow);
+        card.appendChild(top);
+
+        if (showPrompt && item.prompt) {
+          const pBox = document.createElement("div");
+          pBox.className = "prompt-box";
+          const pTxt = document.createElement("span");
+          pTxt.className = "prompt-text";
+          pTxt.textContent = item.prompt;
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "copy-btn";
+          btn.textContent = "Copy";
+          btn.addEventListener("click", () => copyText(item.prompt, btn));
+          pBox.append(pTxt, btn);
+          card.appendChild(pBox);
+        }
+
+        grid.appendChild(card);
+      });
+    }
+
+    // Wire SVG nodes
+    document.querySelectorAll(".svg-node").forEach(node => {
+      node.addEventListener("click", () => renderInspector(node.dataset.agent));
+      node.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          renderInspector(node.dataset.agent);
+        }
+      });
+    });
+
+    // Wire Tabs (keyboard + click)
+    const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+    tabs.forEach((tab, idx) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => {
+          const selected = t === tab;
+          t.setAttribute("aria-selected", String(selected));
+          const panel = document.getElementById(t.getAttribute("aria-controls"));
+          panel.hidden = !selected;
+        });
+      });
+      tab.addEventListener("keydown", e => {
+        if (e.key === "ArrowRight") tabs[(idx + 1) % tabs.length].focus();
+        if (e.key === "ArrowLeft") tabs[(idx - 1 + tabs.length) % tabs.length].focus();
+      });
+    });
+
+    // Initialize
+    renderInspector("01");
+    renderCardGrid("recipes-grid", RECIPES, true);
+    renderCardGrid("automations-grid", AUTOMATIONS, true);
+    renderCardGrid("guardrails-grid", GUARDRAILS, false);
+  </script>
+</body>
+</html>
